@@ -39,6 +39,8 @@ services:
     restart: unless-stopped
     depends_on:
       - router
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   backend:
     container_name: genai-backend
