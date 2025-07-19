@@ -1,0 +1,19 @@
+services:
+  google-drive-mcp-server:
+    build:
+      context: .    
+    stdin_open: true
+    tty: true
+    env_file:
+      - .env
+    ports:
+      - "${GOOGLE_DRIVE_MCP_SERVER_PORT:-5001}:5001"
+    restart: unless-stopped    
+    volumes:
+      - ./logs:/app/logs         # Local log folder (create this manually)
+      - ./src:/app/src           # Optional: sync local source code for dev
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

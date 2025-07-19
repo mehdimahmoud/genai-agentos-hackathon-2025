@@ -1,0 +1,18 @@
+services:
+  notion-mcp-server:
+    build: .
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs         # Local log folder (create this manually)
+      - ./src:/app/src           # Optional: sync local source code for dev
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
