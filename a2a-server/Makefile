@@ -190,15 +190,7 @@ monitor: ## Monitor server health
 		sleep 5; \
 	done
 
-# Quick Development Commands
-quick-test: ## Quick test run
-	uv run python run_tests.py --type unit
 
-quick-lint: ## Quick lint check
-	uv run python -m flake8 src/ --max-line-length=88 --extend-ignore=E203,W503 --count
-
-quick-format: ## Quick format check
-	uv run python -m black --check src/ tests/ --line-length=88
 
 # CI/CD Commands
 ci-test: ## Run tests for CI/CD pipeline

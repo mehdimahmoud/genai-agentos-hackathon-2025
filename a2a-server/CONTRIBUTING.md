@@ -48,7 +48,6 @@ make env-setup      # Set up environment variables
 | `make test-integration` | Run integration tests only | A2A protocol testing |
 | `make test-coverage` | Run tests with coverage report | Quality assurance |
 | `make test-watch` | Run tests in watch mode | Active development |
-| `make quick-test` | Quick test run | Fast feedback |
 
 ### Code Quality
 
@@ -60,8 +59,6 @@ make env-setup      # Set up environment variables
 | `make check` | Run all code quality checks | Before commits, CI/CD |
 | `make type-check` | Run type checking with mypy | Type safety verification |
 | `make security` | Run security checks with bandit | Security audit |
-| `make quick-lint` | Quick lint check | Fast feedback |
-| `make quick-format` | Quick format check | Fast feedback |
 
 ### Development Workflow
 

@@ -15,49 +15,40 @@ a2a-server/
 │       ├── __init__.py                 # Main package exports
 │       ├── main.py                     # Application entry point
 │       ├── agents/                     # Agent implementations
-│       │   ├── __init__.py
-│       │   ├── text_analysis_agent.py  # Main agent implementation
-│       │   └── legacy_agent.py         # Legacy agent (for reference)
-│       ├── core/                       # Core agent functionality
-│       │   ├── __init__.py
-│       │   └── agent.py               # A2A agent core implementation
+│       │   └── text_analysis_agent.py  # Main agent implementation
 │       ├── protocol/                   # A2A protocol implementation
-│       │   ├── __init__.py
-│       │   └── executor.py            # A2A protocol executor
+│       │   └── a2a_types.py          # A2A protocol types
 │       ├── schemas/                    # A2A protocol schemas
-│       │   ├── __init__.py
 │       │   └── a2a_schemas.py        # A2A schema classes
 │       ├── services/                   # Server and service layer
-│       │   ├── __init__.py
-│       │   ├── server.py              # A2A server configuration
-│       │   └── legacy_server.py       # Legacy server (for reference)
-│       ├── tools/                      # Text analysis tools
-│       │   ├── __init__.py
-│       │   ├── grammar_checker.py     # Grammar analysis tool
-│       │   ├── sentiment_analyzer.py  # Sentiment analysis tool
-│       │   ├── statistics_analyzer.py # Text statistics tool
-│       │   ├── summarizer.py          # Text summarization tool
-│       │   ├── paraphraser.py         # Text paraphrasing tool
-│       │   └── entity_extractor.py    # Entity extraction tool
-│       └── utils/                      # Utility functions
-│           └── __init__.py
+│       │   └── a2a_server.py         # A2A server configuration
+│       └── tools/                      # Text analysis tools
+│           ├── __init__.py            # Tool exports
+│           ├── grammar_checker.py     # Grammar analysis tool
+│           ├── sentiment_analyzer.py  # Sentiment analysis tool
+│           ├── statistics_analyzer.py # Text statistics tool
+│           ├── summarizer.py          # Text summarization tool
+│           ├── paraphraser.py         # Text paraphrasing tool
+│           └── entity_extractor.py    # Entity extraction tool
 ├── tests/                              # Comprehensive test suite
-│   ├── __init__.py
 │   ├── unit/                          # Unit tests
-│   │   ├── __init__.py
 │   │   └── test_text_analysis_agent.py
 │   └── integration/                   # Integration tests
-│       ├── __init__.py
 │       └── test_a2a_integration.py
 ├── main.py                            # Main entry point
 ├── pyproject.toml                     # Project configuration (dependencies & metadata)
-├── requirements.txt                   # Runtime dependencies for deployment
 ├── Dockerfile                         # Container configuration
 ├── docker-compose.yml                 # Docker Compose setup
 ├── .env.example                       # Environment variables template
+├── .gitignore                         # Git ignore rules
+├── .flake8                            # Flake8 configuration
 ├── run_tests.py                       # Test runner
 ├── start.sh                           # Docker startup script
-└── README.md                          # This file
+├── remove-image.sh                    # Docker cleanup script
+├── Makefile                           # Development commands
+├── README-A2A.md                      # This file
+├── README-PROJECT-STRUCTURE.md        # Project structure documentation
+└── CONTRIBUTING.md                    # Development guidelines
 ```
 
 ## 🚀 Features
@@ -82,8 +73,7 @@ a2a-server/
 ### Modern Python Packaging
 This project follows modern Python packaging standards:
 - **`pyproject.toml`**: Single source of truth for project metadata and dependencies
-- **`requirements.txt`**: Runtime dependencies for deployment (Docker, production)
-- **No `setup.py`**: Using modern PEP 517/518 compliant packaging
+- **No `requirements.txt`**: Using modern PEP 517/518 compliant packaging
 - **`uv`**: Modern, fast Python package manager (10-100x faster than pip)
 
 ### Prerequisites
@@ -92,7 +82,7 @@ This project follows modern Python packaging standards:
 - Docker (optional, for containerized deployment)
 - Make (for development commands)
 
-### Quick Start with Makefile
+### Quick Start (Recommended)
 ```bash
 # Clone the repository
 git clone <repository-url>
@@ -107,7 +97,7 @@ make install-dev    # Install development dependencies
 make env-setup      # Set up environment variables
 ```
 
-### Manual Installation
+### Or Manual Installation
 ```bash
 # Clone the repository
 git clone <repository-url>
@@ -118,7 +108,7 @@ uv venv
 uv pip install -e ".[dev]"
 
 # Or install production dependencies only
-uv pip install -r requirements.txt
+uv pip install -e .
 ```
 
 ### Docker Deployment
@@ -137,34 +127,19 @@ docker run -p 10002:10002 a2a-text-analysis-agent
 Create a `.env` file based on `.env.example`:
 
 ```bash
-# Server Configuration
-HOST=0.0.0.0
-PORT=10002
-DEBUG=false
+# A2A Server Configuration
+A2A_SERVER_HOST=0.0.0.0
+A2A_SERVER_PORT=10002
 
-# Agent Configuration
-AGENT_URL=http://host.docker.internal:10002/
+# Agent URL (used in agent card)
+A2A_AGENT_URL=http://host.docker.internal:10002/
 
-# A2A Protocol Configuration
-A2A_PROTOCOL_VERSION=1.0.0
+# Logging Configuration
+LOG_LEVEL=debug
 ```
 
 ### Docker Configuration
-The `docker-compose.yml` includes proper networking configuration for A2A integration:
-
-```yaml
-services:
-  a2a-text-analysis-agent:
-    build: .
-    ports:
-      - "10002:10002"
-    environment:
-      - HOST=0.0.0.0
-      - PORT=10002
-      - AGENT_URL=http://host.docker.internal:10002/
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-```
+The `docker-compose.yml` includes proper networking configuration for A2A integration.
 
 ## 🧪 Testing & Code Quality
 
@@ -190,26 +165,21 @@ make security      # Run security checks with bandit
 
 # Complete QA pipeline
 make qa            # Run all quality checks and tests
-
-# Quick development commands
-make quick-test    # Quick unit test run
-make quick-lint    # Quick lint check
-make quick-format  # Quick format check
 ```
 
 > 📖 **For detailed development workflow and command explanations, see [CONTRIBUTING.md](CONTRIBUTING.md)**
 
-### Manual Testing Commands
+### Or Manual Testing Commands
 ```bash
 # Run all tests
-python run_tests.py
+uv run python run_tests.py
 
 # Run specific test categories
-python -m pytest tests/unit/
-python -m pytest tests/integration/
+uv run python -m pytest tests/unit/
+uv run python -m pytest tests/integration/
 
 # Run with coverage
-python -m pytest --cov=src/a2a_text_analysis_agent tests/
+uv run python -m pytest --cov=src/a2a_text_analysis_agent tests/
 ```
 
 ### Test Structure
@@ -244,7 +214,7 @@ The agent exposes its capabilities via the `/.well-known/agent.json` endpoint:
 {
   "name": "Text Analysis Agent",
   "description": "A versatile text analysis agent...",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "url": "http://host.docker.internal:10002/",
   "skills": [
     {
@@ -281,7 +251,7 @@ The agent accepts A2A protocol messages and returns structured responses:
 docker-compose -f docker-compose.yml up -d
 
 # View logs
-docker-compose logs -f a2a-text-analysis-agent
+docker-compose logs -f text-analysis-agent
 ```
 
 ### Kubernetes
@@ -306,9 +276,9 @@ spec:
         ports:
         - containerPort: 10002
         env:
-        - name: HOST
+        - name: A2A_SERVER_HOST
           value: "0.0.0.0"
-        - name: PORT
+        - name: A2A_SERVER_PORT
           value: "10002"
 ```
 
@@ -335,8 +305,56 @@ spec:
 Enable debug mode for detailed logging:
 
 ```bash
-DEBUG=true python main.py
+LOG_LEVEL=debug uv run python main.py
 ```
+
+## 🚀 Extensibility & Multi-Agent Support
+
+This project is designed with extensibility in mind and can be extended to support multiple A2A agents. The modular architecture makes it easy to add new agents with different capabilities.
+
+### Multi-Agent Architecture
+
+The current structure can be extended to support multiple agents by:
+
+1. **Agent Registry**: Implement a central agent registry that manages multiple A2A agents
+2. **Load Balancing**: Route requests to appropriate agents based on capabilities
+3. **Agent Discovery**: Enhanced discovery mechanism for multiple agents
+4. **Shared Infrastructure**: Common services, logging, and monitoring across agents
+
+### Example Multi-Agent Setup
+
+```python
+# Future implementation example
+class MultiAgentServer:
+    def __init__(self):
+        self.agents = {
+            "text-analysis": TextAnalysisAgent(),
+            "image-processing": ImageProcessingAgent(),
+            "data-analysis": DataAnalysisAgent(),
+            "code-review": CodeReviewAgent()
+        }
+    
+    async def route_request(self, request):
+        # Route to appropriate agent based on task type
+        agent = self.select_agent(request.task)
+        return await agent.execute(request)
+```
+
+### Benefits of Multi-Agent Architecture
+
+- **Specialized Capabilities**: Each agent can focus on specific domains
+- **Scalability**: Independent scaling of different agent types
+- **Fault Isolation**: Issues with one agent don't affect others
+- **Resource Optimization**: Efficient resource allocation per agent type
+- **Flexible Deployment**: Deploy agents independently or together
+
+### Future Roadmap
+
+- [ ] Multi-agent registry and discovery
+- [ ] Load balancing and routing
+- [ ] Agent health monitoring
+- [ ] Cross-agent communication protocols
+- [ ] Unified agent management interface
 
 ## 🤝 Contributing
 
